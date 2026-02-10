@@ -1,0 +1,5 @@
+{
+  "name": "@repo/agents",
+  "private": true,
+  "type": "module"
+}

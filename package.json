@@ -13,6 +13,8 @@
     "turbo": "^2.0.0"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.23",
+    "ai": "^6.0.78",
     "hono": "^4.11.9",
     "react": "^19.2.4"
   }

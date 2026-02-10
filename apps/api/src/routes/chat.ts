@@ -1,11 +1,15 @@
 import { Hono } from 'hono'
-
+import { ChatService } from '@repo/services'
 export const chatRoutes = new Hono()
   .post('/messages', async(c) => {
-     const body = await c.req.json()
+      const body = await c.req.json()
 
-    return c.json({
+    const chatService = new ChatService()
+
+    const result = await chatService.sendMessage({
       conversationId: body.conversationId,
-      reply: 'RPC wired successfully'
+      message: body.message
     })
+
+    return c.json(result)
   })
