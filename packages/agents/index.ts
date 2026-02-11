@@ -1,2 +1,7 @@
 export * from './router.agent.js'
+export * from './agent.service.js'
+export * from './support.agent.js'
+export * from './order.agent.js'
+export * from './billing.agent.js'
+export * from './agent.interface.js'
 export * from './types.js'

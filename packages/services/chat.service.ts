@@ -1,5 +1,5 @@
 import { ConversationService } from '@repo/services'
-import { RouterAgent } from '@repo/agents'
+import { RouterAgent, AgentService } from '@repo/agents'
 
 
 export type SendMessageInput = {
@@ -15,6 +15,7 @@ export type SendMessageOutput = {
 export class ChatService {
   private conversationService = new ConversationService()
   private routerAgent = new RouterAgent()
+  private agentService = new AgentService()
 
   async sendMessage(input: {
     conversationId: string
@@ -30,9 +31,15 @@ export class ChatService {
       context
     )
 
+    const response = await this.agentService.handle(
+      route.agent,
+      input.message,
+      context
+    )
+
     return {
       conversationId: input.conversationId,
-      reply: `Routed to ${route.agent} agent`
+      reply: response.reply
     }
   }
 }
