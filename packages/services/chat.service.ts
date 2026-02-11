@@ -1,6 +1,7 @@
 import { ConversationService } from '@repo/services'
 import { RouterAgent, AgentService } from '@repo/agents'
 
+import { prisma } from '@repo/db'
 
 export type SendMessageInput = {
   conversationId: string
@@ -36,6 +37,22 @@ export class ChatService {
       input.message,
       context
     )
+    await prisma.message.create({
+      data: {
+        conversationId: input.conversationId,
+        role: 'user',
+        content: input.message
+      }
+    })
+
+    await prisma.message.create({
+      data: {
+        conversationId: input.conversationId,
+        role: 'agent',
+        content: response.reply
+      }
+    })
+
 
     return {
       conversationId: input.conversationId,
