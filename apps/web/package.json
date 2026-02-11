@@ -1,8 +1,13 @@
 {
   "name": "@repo/web",
   "dependencies": {
+    "@repo/api": "*",
+    "@repo/services": "*",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "@repo/services": "*"
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.13",
+    "@types/react-dom": "^19.2.3"
   }
 }

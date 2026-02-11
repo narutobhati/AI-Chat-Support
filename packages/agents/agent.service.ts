@@ -9,19 +9,19 @@ export class AgentService {
   private orderAgent = new OrderAgent()
   private billingAgent = new BillingAgent()
 
-  async handle(
+  async stream(
     agent: AgentType,
     message: string,
     context: ConversationContext
   ) {
     switch (agent) {
       case 'order':
-        return this.orderAgent.handle({ message, context })
+        return this.orderAgent.stream({ message, context })
       case 'billing':
-        return this.billingAgent.handle({ message, context })
+        return this.billingAgent.stream({ message, context })
       case 'support':
       default:
-        return this.supportAgent.handle({ message, context })
+        return this.supportAgent.stream({ message, context })
     }
   }
 }

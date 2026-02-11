@@ -1,62 +1,58 @@
-import { ConversationService } from '@repo/services'
-import { RouterAgent, AgentService } from '@repo/agents'
-
 import { prisma } from '@repo/db'
-
-export type SendMessageInput = {
-  conversationId: string
-  message: string
-}
-
-export type SendMessageOutput = {
-  conversationId: string
-  reply: string
-}
+import { RouterAgent, AgentService } from '@repo/agents'
+import { ConversationService } from './conversation.service.js'
 
 export class ChatService {
   private conversationService = new ConversationService()
   private routerAgent = new RouterAgent()
   private agentService = new AgentService()
 
-  async sendMessage(input: {
+  async streamMessage(input: {
     conversationId: string
     message: string
   }) {
-    const context =
-      await this.conversationService.loadConversation(
-        input.conversationId
-      )
+    const { conversationId, message } = input
 
-    const route = await this.routerAgent.route(
-      input.message,
-      context
-    )
-
-    const response = await this.agentService.handle(
-      route.agent,
-      input.message,
-      context
-    )
     await prisma.message.create({
       data: {
-        conversationId: input.conversationId,
+        conversationId,
         role: 'user',
-        content: input.message
+        content: message
       }
     })
 
-    await prisma.message.create({
-      data: {
-        conversationId: input.conversationId,
-        role: 'agent',
-        content: response.reply
+    const context =
+      await this.conversationService.loadConversation(conversationId)
+
+    const route = await this.routerAgent.route(message, context)
+
+    const stream = await this.agentService.stream(
+      route.agent,
+      message,
+      context
+    )
+
+    let fullReply = ''
+
+    const readable = new ReadableStream({
+      async start(controller) {
+        for await (const chunk of stream.textStream) {
+          fullReply += chunk
+          controller.enqueue(chunk)
+        }
+
+        controller.close()
+
+        await prisma.message.create({
+          data: {
+            conversationId,
+            role: 'agent',
+            content: fullReply
+          }
+        })
       }
     })
 
-
-    return {
-      conversationId: input.conversationId,
-      reply: response.reply
-    }
+    return readable
   }
 }

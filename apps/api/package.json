@@ -1,6 +1,11 @@
 {
-  "name": "@repo/api",
+   "name": "@repo/api",
+  "version": "0.0.0",
+  "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/app.ts"
+  },
   "dependencies": {
     "hono": "^4.0.0",
     "@repo/agents": "*",

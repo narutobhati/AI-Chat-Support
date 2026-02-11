@@ -1,11 +1,9 @@
-import { generateText } from 'ai'
+import { streamText } from 'ai'
 import { geminiModel } from './llm.js'
-import type { SupportAgentInput, AgentResponse } from './agent.interface.js'
+import type { SupportAgentInput } from './agent.interface.js'
 
 export class SupportAgent {
-  async handle(
-    input: SupportAgentInput
-  ): Promise<AgentResponse> {
+  async stream(input: SupportAgentInput) {
     const prompt = `
 You are a customer support assistant.
 
@@ -19,11 +17,9 @@ User message:
 ${input.message}
     `.trim()
 
-    const result = await generateText({
+    return streamText({
       model: geminiModel,
       prompt
     })
-
-    return { reply: result.text }
   }
 }

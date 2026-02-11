@@ -1,11 +1,19 @@
-import { generateText } from 'ai'
+import { streamText } from 'ai'
 import { geminiModel } from './llm.js'
-import type { SupportAgentInput, AgentResponse } from './agent.interface.js'
+import { getPaymentById } from './tools/billing.tools.js'
+import type { SupportAgentInput } from './agent.interface.js'
 
 export class BillingAgent {
-  async handle(
-    input: SupportAgentInput
-  ): Promise<AgentResponse> {
+  async stream(input: SupportAgentInput) {
+
+    // Optional simple extraction
+    const paymentMatch = input.message.match(/pay[_\s]?(\d+)/i)
+
+    let paymentData = null
+    if (paymentMatch) {
+      paymentData = await getPaymentById(`pay_${paymentMatch[1]}`)
+    }
+
     const prompt = `
 You are a billing support agent.
 
@@ -14,8 +22,8 @@ Handle:
 - refunds
 - invoices
 
-If exact billing data is missing, respond clearly
-and explain next steps.
+Payment data:
+${paymentData ? JSON.stringify(paymentData) : 'No payment found'}
 
 Conversation summary:
 ${input.context.summary ?? 'None'}
@@ -24,11 +32,9 @@ User message:
 ${input.message}
     `.trim()
 
-    const result = await generateText({
+    return streamText({
       model: geminiModel,
       prompt
     })
-
-    return { reply: result.text }
   }
 }
